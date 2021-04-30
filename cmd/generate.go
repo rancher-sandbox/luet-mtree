@@ -14,14 +14,12 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-
 package cmd
 
 import (
-	"github.com/spf13/cobra"
 	"github.com/itxaka/luet-mtree/pkg/action"
+	"github.com/spf13/cobra"
 )
-
 
 // generateCmd represents the generate command
 func newGenerateCmd() *cobra.Command {
@@ -45,7 +43,7 @@ func newGenerateCmd() *cobra.Command {
 		},
 	}
 	f := cmd.Flags()
-	f.StringVarP(&outputFile, "output", "o","", "Name for output file, otherwise it defaults to stdout")
+	f.StringVarP(&outputFile, "output", "o", "", "Name for output file, otherwise it defaults to stdout")
 	f.StringSliceVarP(&keywords, "keywords", "k", []string{}, "Keywords to use to generate the tree (sha256 will automatically be added)")
 	return cmd
 }

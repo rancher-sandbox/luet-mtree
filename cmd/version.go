@@ -6,11 +6,10 @@ import (
 	"github.com/spf13/cobra"
 )
 
-
 func newVersionCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use: "version",
-		Args: cobra.ExactArgs(0),
+		Use:   "version",
+		Args:  cobra.ExactArgs(0),
 		Short: "Print the version",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			v := version.Get()
@@ -24,6 +23,6 @@ func newVersionCmd() *cobra.Command {
 		},
 	}
 	f := cmd.Flags()
-	f.Bool("long", false,"Show long version info")
+	f.Bool("long", false, "Show long version info")
 	return cmd
 }

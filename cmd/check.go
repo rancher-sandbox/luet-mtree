@@ -14,20 +14,19 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-
 package cmd
 
 import (
-	"github.com/spf13/cobra"
 	"github.com/itxaka/luet-mtree/pkg/action"
+	"github.com/spf13/cobra"
 )
 
 // checkCmd represents the check command
 func newCheckCmd() *cobra.Command {
 	var format string
 	cmd := &cobra.Command{
-		Use:   "check [file or dir] [validation file]",
-		Short: "Check a file or dir against a validation file",
+		Use:          "check [file or dir] [validation file]",
+		Short:        "Check a file or dir against a validation file",
 		SilenceUsage: true,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if len(args) != 2 {
@@ -37,10 +36,10 @@ func newCheckCmd() *cobra.Command {
 
 			// Just checking if the value is valid
 			switch format {
-				case "bsd", "json", "path":
-				default:
-					_ = cmd.Usage()
-					return nil
+			case "bsd", "json", "path":
+			default:
+				_ = cmd.Usage()
+				return nil
 			}
 
 			checkAction := action.NewCheckAction(args[0], args[1], format)
@@ -53,7 +52,7 @@ func newCheckCmd() *cobra.Command {
 	}
 
 	f := cmd.Flags()
-	f.StringVarP(&format, "format", "f","bsd", "Format for output. Choices are bsd, path and json.")
+	f.StringVarP(&format, "format", "f", "bsd", "Format for output. Choices are bsd, path and json.")
 
- 	return cmd
+	return cmd
 }

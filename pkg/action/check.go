@@ -26,9 +26,9 @@ import (
 )
 
 type checkAction struct {
-	target string
+	target         string
 	validationFile string
-	format string
+	format         string
 }
 
 func NewCheckAction(t string, v string, f string) *checkAction {
@@ -55,7 +55,6 @@ func (action checkAction) Run() error {
 	specKeywords := spec.UsedKeywords()
 	stateKeyworks := spec.UsedKeywords()
 
-
 	stateDh, err = mtree.Walk(action.target, excludes, stateKeyworks, nil)
 	res, err = mtree.Compare(spec, stateDh, specKeywords)
 	if err != nil {
@@ -74,7 +73,6 @@ func (action checkAction) Run() error {
 	}
 	return nil
 }
-
 
 var formats = map[string]func([]mtree.InodeDelta) string{
 	// Outputs the errors in the BSD format.

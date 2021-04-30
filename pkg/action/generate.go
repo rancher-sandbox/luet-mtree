@@ -23,15 +23,14 @@ import (
 )
 
 type generateAction struct {
-	target string
+	target     string
 	outputFile string
-	keywords []string
+	keywords   []string
 }
 
 func NewGenerateAction(t string, o string, k []string) *generateAction {
 	return &generateAction{target: t, outputFile: o, keywords: k}
 }
-
 
 func (action generateAction) Run() error {
 	stateDh := &mtree.DirectoryHierarchy{}

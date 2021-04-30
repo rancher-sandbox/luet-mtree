@@ -7,4 +7,14 @@ LDFLAGS += -X "github.com/itxaka/luet-mtree/internal/version.version=${GIT_TAG}"
 LDFLAGS += -X "github.com/itxaka/luet-mtree/internal/version.gitCommit=${GIT_COMMIT}"
 
 build:
-	go build -ldflags '$(LDFLAGS)'
+	go build -ldflags '$(LDFLAGS)' -o bin/
+
+vet:
+	go vet ./...
+
+fmt:
+	go fmt ./...
+
+lint: fmt vet
+
+all: build

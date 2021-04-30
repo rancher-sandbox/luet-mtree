@@ -14,7 +14,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-
 package cmd
 
 import (
@@ -24,8 +23,8 @@ import (
 // NewRootCmd represents the base command when called without any subcommands
 func NewRootCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "luet-mtree",
-		Short: "A brief description of your application",
+		Use:           "luet-mtree",
+		Short:         "A brief description of your application",
 		SilenceErrors: true,
 	}
 
