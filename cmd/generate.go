@@ -18,9 +18,8 @@ limitations under the License.
 package cmd
 
 import (
-	"fmt"
 	"github.com/spf13/cobra"
-	"luet-mtree/pkg/action"
+	"github.com/itxaka/luet-mtree/pkg/action"
 )
 
 
@@ -37,7 +36,6 @@ func newGenerateCmd() *cobra.Command {
 				_ = cmd.Usage()
 				return nil
 			}
-			fmt.Print(cmd.Flag("keywords").Value)
 			generateAction := action.NewGenerateAction(args[0], outputFile, keywords)
 			err := generateAction.Run()
 			if err != nil {

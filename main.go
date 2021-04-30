@@ -17,7 +17,7 @@ package main
 
 import (
 	"fmt"
-	"luet-mtree/cmd"
+	"github.com/itxaka/luet-mtree/cmd"
 	"os"
 )
 

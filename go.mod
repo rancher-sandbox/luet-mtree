@@ -1,4 +1,4 @@
-module luet-mtree
+module github.com/itxaka/luet-mtree
 
 go 1.16
 

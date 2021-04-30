@@ -1,0 +1,12 @@
+[size type uid gid mode link nlink time]#          user: itxaka
+#       machine: zeus
+#          tree: pkg/action/testdata/checkfiles
+#          date: Thu Apr 29 16:28:23 2021
+#      keywords: size,type,uid,gid,mode,link,nlink,time,sha256digest
+
+# .
+/set type=file nlink=1 mode=0664 uid=1000 gid=100
+. size=20 type=dir mode=0755 time=1619706154.813906041
+    file1 size=0 mode=0644 time=1619706147.717793428 sha256digest=e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+    file2 size=0 mode=0644 time=1619706154.813906041 sha256digest=e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+..

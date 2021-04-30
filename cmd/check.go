@@ -19,7 +19,7 @@ package cmd
 
 import (
 	"github.com/spf13/cobra"
-	"luet-mtree/pkg/action"
+	"github.com/itxaka/luet-mtree/pkg/action"
 )
 
 // checkCmd represents the check command
