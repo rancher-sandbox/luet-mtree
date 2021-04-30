@@ -15,6 +15,10 @@ vet:
 fmt:
 	go fmt ./...
 
+test:
+	go test ./... -race
+
 lint: fmt vet
 
-all: build
+
+all: lint test build
