@@ -17,7 +17,6 @@ limitations under the License.
 package action
 
 import (
-	"fmt"
 	"github.com/vbatts/go-mtree"
 	"os"
 )
@@ -33,6 +32,16 @@ func NewGenerateAction(t string, o string, k []string) *generateAction {
 }
 
 func (action generateAction) Run() error {
+	// If its not a dir, try to uncompress
+	info, _ := os.Stat(action.target)
+	if !info.IsDir() {
+		tmpDir, _ := os.MkdirTemp("", "luet-mtree")
+		defer os.RemoveAll(tmpDir)
+		newTarget, err := unTar(action.target, tmpDir)
+		if err != nil { return err }
+		action.target = newTarget
+	}
+
 	stateDh := &mtree.DirectoryHierarchy{}
 	var excludes []mtree.ExcludeFunc
 	var err error
@@ -46,11 +55,23 @@ func (action generateAction) Run() error {
 	}
 
 	// TODO(itxaka): Do we want all keywords or its enough with just the sha?
-	currentKeywords := mtree.DefaultKeywords[:]
-	if len(action.keywords) > 0 {
-		currentKeywords = mtree.ToKeywords(action.keywords)
+	// Time and size seem not to match probably because of the extraction manipulation?
+	currentKeywords := []mtree.Keyword{
+		"type",
+		"uid",
+		"gid",
+		"mode",
+		"link",
+		"nlink",
 	}
-	fmt.Print(currentKeywords)
+
+	if len(action.keywords) > 0 {
+		for _, k := range action.keywords {
+			if !mtree.InKeywordSlice(mtree.Keyword(k), currentKeywords) {
+				currentKeywords = append(currentKeywords, mtree.Keyword(k))
+			}
+		}
+	}
 
 	currentKeywords = append(currentKeywords, "sha256digest")
 	stateDh, err = mtree.Walk(action.target, excludes, currentKeywords, nil)

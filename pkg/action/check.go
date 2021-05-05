@@ -36,6 +36,16 @@ func NewCheckAction(t string, v string, f string) *checkAction {
 }
 
 func (action checkAction) Run() error {
+	// If its not a dir, try to uncompress
+	info, _ := os.Stat(action.target)
+	if !info.IsDir() {
+		tmpDir, _ := os.MkdirTemp("", "luet-mtree")
+		defer os.RemoveAll(tmpDir)
+		newTarget, err := unTar(action.target, tmpDir)
+		if err != nil { return err }
+		action.target = newTarget
+	}
+
 	spec := &mtree.DirectoryHierarchy{}
 	stateDh := &mtree.DirectoryHierarchy{}
 	var err error
