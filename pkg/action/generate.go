@@ -54,8 +54,8 @@ func (action generateAction) Run() error {
 		}
 	}
 
-	// TODO(itxaka): Do we want all keywords or its enough with just the sha?
-	// Time and size seem not to match probably because of the extraction manipulation?
+	// Ignore time because luet tars files with the docker lib and that truncates the time to seconds only
+	// TODO(itxaka) we may be able to use tar_time ?
 	currentKeywords := []mtree.Keyword{
 		"type",
 		"uid",
@@ -64,7 +64,6 @@ func (action generateAction) Run() error {
 		"link",
 		"nlink",
 		"size",
-		"time",
 		"xattrs",
 		"sha512digest",
 	}

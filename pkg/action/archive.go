@@ -54,7 +54,8 @@ func unTar(target string, tmpDir string) (string, error) {
 
 	for {
 		header, err := tarReader.Next()
-
+		// Remember to access any values from header below this error check, otherwise you could be accessing an empty
+		// header and provoke a runtime error!
 		switch {
 			// if no more files are found return as we have our extracted dir
 			case err == io.EOF:
@@ -73,11 +74,21 @@ func unTar(target string, tmpDir string) (string, error) {
 				_ = os.MkdirAll(targetDir, fileInfo.Mode().Perm())
 			}
 		} else {
-			f, _ := os.OpenFile(targetDir, os.O_CREATE|os.O_RDWR, fileInfo.Mode().Perm())
-			n, _ := io.Copy(f, tarReader)
-			_ = f.Close()
+			f, err := os.OpenFile(targetDir, os.O_CREATE|os.O_RDWR, fileInfo.Mode().Perm())
+			if err != nil {
+				return "", fmt.Errorf("failure creating file %s: %s\n", header.Name, err)
+			}
+			n, err := io.Copy(f, tarReader)
+			if err != nil {
+				return "", fmt.Errorf("failure to copy to file %s: %s\n", header.Name, err)
+			}
+			err = f.Close()
+			if err != nil{
+				return "", fmt.Errorf("failure closing file %s: %s\n", header.Name, err)
+			}
+
 			if n != fileInfo.Size() {
-				return "", fmt.Errorf("wrote %d, want %d", n, fileInfo.Size())
+				return "", fmt.Errorf("size extracted for %s differs from size wanted: %d -> %d\n", header.Name, n, fileInfo.Size())
 			}
 		}
 	}
