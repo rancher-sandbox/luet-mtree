@@ -63,6 +63,10 @@ func (action generateAction) Run() error {
 		"mode",
 		"link",
 		"nlink",
+		"size",
+		"time",
+		"xattrs",
+		"sha512digest",
 	}
 
 	if len(action.keywords) > 0 {
@@ -73,7 +77,6 @@ func (action generateAction) Run() error {
 		}
 	}
 
-	currentKeywords = append(currentKeywords, "sha256digest")
 	stateDh, err = mtree.Walk(action.target, excludes, currentKeywords, nil)
 	if err != nil {
 		return err

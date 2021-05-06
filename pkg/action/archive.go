@@ -18,7 +18,6 @@ package action
 
 import (
 	"archive/tar"
-	"bytes"
 	"fmt"
 	"github.com/gabriel-vasile/mimetype"
 	"github.com/klauspost/compress/gzip"
@@ -38,22 +37,20 @@ const (
 func unTar(target string, tmpDir string) (string, error) {
 	targetDir := ""
 	original, _ := os.Open(target)
-	buf := bytes.Buffer{}
+	var r io.Reader
 
 	if compressType(target) == GZIP {
-		r, _ := gzip.NewReader(original)
-		_, _ = r.WriteTo(&buf)
+		r, _ = gzip.NewReader(original)
 		fmt.Printf("Found gzip compression\n")
 	} else if compressType(target) == ZSTD{
-		r, _ := zstd.NewReader(original)
-		_, _ = r.WriteTo(&buf)
+		r, _ = zstd.NewReader(original)
 		fmt.Printf("Found zstd compression\n")
 	} else {
-		_, _ = io.Copy(&buf, original)
+		r = original
 		fmt.Printf("Found no compression\n")
 	}
 
-	tarReader := tar.NewReader(&buf)
+	tarReader := tar.NewReader(r)
 
 	for {
 		header, err := tarReader.Next()
@@ -68,21 +65,22 @@ func unTar(target string, tmpDir string) (string, error) {
 				return "", err
 		}
 
+		fileInfo := header.FileInfo()
 		targetDir = filepath.Join(tmpDir, header.Name)
-		switch header.Typeflag {
-			// Dir
-			case tar.TypeDir:
-				if _, err := os.Stat(targetDir); err != nil {
-					_ = os.MkdirAll(targetDir, os.FileMode(header.Mode))
-				}
 
-			// file
-			case tar.TypeReg:
-				f, _ := os.OpenFile(targetDir, os.O_CREATE|os.O_RDWR, os.FileMode(header.Mode))
-				_, _ = io.Copy(f, tarReader)
-				_ = f.Close()
+		if fileInfo.IsDir() {
+			if _, err := os.Stat(targetDir); err != nil {
+				_ = os.MkdirAll(targetDir, fileInfo.Mode().Perm())
+			}
+		} else {
+			f, _ := os.OpenFile(targetDir, os.O_CREATE|os.O_RDWR, fileInfo.Mode().Perm())
+			n, _ := io.Copy(f, tarReader)
+			_ = f.Close()
+			if n != fileInfo.Size() {
+				return "", fmt.Errorf("wrote %d, want %d", n, fileInfo.Size())
 			}
 		}
+	}
 }
 
 
