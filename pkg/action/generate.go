@@ -48,7 +48,7 @@ func (action generateAction) Run() error {
 
 	fh := os.Stdout
 	if action.outputFile != "" {
-		fh, err = os.Create(action.outputFile)
+		fh, err = os.OpenFile(action.outputFile, os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0666)
 		if err != nil {
 			return err
 		}
@@ -63,7 +63,7 @@ func (action generateAction) Run() error {
 		"mode",
 		"link",
 		"nlink",
-		"size",
+		//"size",
 		"xattrs",
 		"sha512digest",
 	}
