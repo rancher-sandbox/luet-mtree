@@ -34,21 +34,32 @@ func NewGenerateAction(t string, o string, k []string) *generateAction {
 func (action generateAction) Run() error {
 	// If its not a dir, try to uncompress
 	info, _ := os.Stat(action.target)
+	var tmpDir string
 	if !info.IsDir() {
-		tmpDir, _ := os.MkdirTemp("", "luet-mtree")
-		defer os.RemoveAll(tmpDir)
+		tmpDir, _ = os.MkdirTemp("", "luet-mtree")
+
 		newTarget, err := unTar(action.target, tmpDir)
 		if err != nil { return err }
 		action.target = newTarget
 	}
+	// Defer the remove tmpDir here or face the consequences
+	defer os.RemoveAll(tmpDir)
 
 	stateDh := &mtree.DirectoryHierarchy{}
 	var excludes []mtree.ExcludeFunc
+	// excludeEmptyFiles is an ExcludeFunc for excluding all files with 0 size
+	var excludeEmptyFiles = func(path string, info os.FileInfo) bool {
+		if info.Size() == 0{
+			return true
+		}
+		return false
+	}
+	excludes = append(excludes, excludeEmptyFiles)
 	var err error
 
 	fh := os.Stdout
 	if action.outputFile != "" {
-		fh, err = os.OpenFile(action.outputFile, os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0666)
+		fh, err = os.OpenFile(action.outputFile, os.O_WRONLY|os.O_TRUNC|os.O_CREATE, 0666)
 		if err != nil {
 			return err
 		}

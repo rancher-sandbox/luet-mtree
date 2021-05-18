@@ -50,6 +50,14 @@ func (action checkAction) Run() error {
 	stateDh := &mtree.DirectoryHierarchy{}
 	var err error
 	var excludes []mtree.ExcludeFunc
+	// excludeEmptyFiles is an ExcludeFunc for excluding all files with 0 size
+	var excludeEmptyFiles = func(path string, info os.FileInfo) bool {
+		if info.Size() == 0{
+			return true
+		}
+		return false
+	}
+	excludes = append(excludes, excludeEmptyFiles)
 	var res []mtree.InodeDelta
 
 	fh, err := os.Open(action.validationFile)
