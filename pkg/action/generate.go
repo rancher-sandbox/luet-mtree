@@ -57,14 +57,6 @@ func (action generateAction) Run() error {
 	// Ignore time because luet tars files with the docker lib and that truncates the time to seconds only
 	// TODO(itxaka) we may be able to use tar_time ?
 	currentKeywords := []mtree.Keyword{
-		"type",
-		"uid",
-		"gid",
-		"mode",
-		"link",
-		"nlink",
-		//"size",
-		"xattrs",
 		"sha512digest",
 	}
 
