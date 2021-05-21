@@ -17,14 +17,12 @@ limitations under the License.
 package action
 
 import (
-	"archive/tar"
 	"fmt"
 	"github.com/gabriel-vasile/mimetype"
 	"github.com/klauspost/compress/gzip"
 	"github.com/klauspost/compress/zstd"
 	"io"
 	"os"
-	"path/filepath"
 )
 
 const (
@@ -34,8 +32,7 @@ const (
 )
 
 
-func unTar(target string, tmpDir string) (string, error) {
-	targetDir := ""
+func unCompress(target string) (io.Reader, error) {
 	original, _ := os.Open(target)
 	var r io.Reader
 
@@ -50,48 +47,7 @@ func unTar(target string, tmpDir string) (string, error) {
 		fmt.Printf("Found no compression\n")
 	}
 
-	tarReader := tar.NewReader(r)
-
-	for {
-		header, err := tarReader.Next()
-		// Remember to access any values from header below this error check, otherwise you could be accessing an empty
-		// header and provoke a runtime error!
-		switch {
-			// if no more files are found return as we have our extracted dir
-			case err == io.EOF:
-				return tmpDir, nil
-			// if error or header nil, not a tar archive
-			case err != nil || header == nil:
-				fmt.Printf("Error reading file: %v (Not a tar archive?)\n", err)
-				return "", err
-		}
-
-		fileInfo := header.FileInfo()
-		targetDir = filepath.Join(tmpDir, header.Name)
-
-		if fileInfo.IsDir() {
-			if _, err := os.Stat(targetDir); err != nil {
-				_ = os.MkdirAll(targetDir, fileInfo.Mode().Perm())
-			}
-		} else {
-			f, err := os.OpenFile(targetDir, os.O_CREATE|os.O_RDWR, fileInfo.Mode().Perm())
-			if err != nil {
-				return "", fmt.Errorf("failure creating file %s: %s\n", header.Name, err)
-			}
-			n, err := io.Copy(f, tarReader)
-			if err != nil {
-				return "", fmt.Errorf("failure to copy to file %s: %s\n", header.Name, err)
-			}
-			err = f.Close()
-			if err != nil{
-				return "", fmt.Errorf("failure closing file %s: %s\n", header.Name, err)
-			}
-
-			if n != fileInfo.Size() {
-				return "", fmt.Errorf("size extracted for %s differs from size wanted: %d -> %d\n", header.Name, n, fileInfo.Size())
-			}
-		}
-	}
+	return r, nil
 }
 
 

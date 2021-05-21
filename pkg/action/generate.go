@@ -18,6 +18,8 @@ package action
 
 import (
 	"github.com/vbatts/go-mtree"
+	"io"
+	"io/ioutil"
 	"os"
 )
 
@@ -34,28 +36,19 @@ func NewGenerateAction(t string, o string, k []string) *generateAction {
 func (action generateAction) Run() error {
 	// If its not a dir, try to uncompress
 	info, _ := os.Stat(action.target)
-	var tmpDir string
-	if !info.IsDir() {
-		tmpDir, _ = os.MkdirTemp("", "luet-mtree")
-
-		newTarget, err := unTar(action.target, tmpDir)
-		if err != nil { return err }
-		action.target = newTarget
-	}
-	// Defer the remove tmpDir here or face the consequences
-	defer os.RemoveAll(tmpDir)
-
 	stateDh := &mtree.DirectoryHierarchy{}
 	var excludes []mtree.ExcludeFunc
-	// excludeEmptyFiles is an ExcludeFunc for excluding all files with 0 size
-	var excludeEmptyFiles = func(path string, info os.FileInfo) bool {
-		if info.Size() == 0{
-			return true
-		}
-		return false
-	}
-	excludes = append(excludes, excludeEmptyFiles)
+
 	var err error
+
+	// excludeEmptyFiles is an ExcludeFunc for excluding all files with 0 size
+	//var excludeEmptyFiles = func(path string, info os.FileInfo) bool {
+	//	if info.Size() == 0{
+	//return true
+	//}
+	//	return false
+	//}
+	//excludes = append(excludes, excludeEmptyFiles)
 
 	fh := os.Stdout
 	if action.outputFile != "" {
@@ -68,6 +61,10 @@ func (action generateAction) Run() error {
 	// Ignore time because luet tars files with the docker lib and that truncates the time to seconds only
 	// TODO(itxaka) we may be able to use tar_time ?
 	currentKeywords := []mtree.Keyword{
+		"mode",
+		"uid",
+		"gid",
+		"xattrs",
 		"sha512digest",
 	}
 
@@ -79,9 +76,24 @@ func (action generateAction) Run() error {
 		}
 	}
 
-	stateDh, err = mtree.Walk(action.target, excludes, currentKeywords, nil)
-	if err != nil {
-		return err
+	if !info.IsDir() {
+		uncompressedTar, err := unCompress(action.target)
+		ts := mtree.NewTarStreamer(uncompressedTar, excludes, currentKeywords)
+		if _, err := io.Copy(ioutil.Discard, ts); err != nil && err != io.EOF {
+			return err
+		}
+		if err := ts.Close(); err != nil {
+			return err
+		}
+		stateDh, err = ts.Hierarchy()
+		if err != nil {
+			return err
+		}
+	} else {
+		stateDh, err = mtree.Walk(action.target, excludes, currentKeywords, nil)
+		if err != nil {
+			return err
+		}
 	}
 
 	_, err = stateDh.WriteTo(fh)

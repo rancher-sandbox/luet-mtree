@@ -22,6 +22,8 @@ import (
 	"errors"
 	"fmt"
 	"github.com/vbatts/go-mtree"
+	"io"
+	"io/ioutil"
 	"os"
 )
 
@@ -36,28 +38,10 @@ func NewCheckAction(t string, v string, f string) *checkAction {
 }
 
 func (action checkAction) Run() error {
-	// If its not a dir, try to uncompress
-	info, _ := os.Stat(action.target)
-	if !info.IsDir() {
-		tmpDir, _ := os.MkdirTemp("", "luet-mtree")
-		defer os.RemoveAll(tmpDir)
-		newTarget, err := unTar(action.target, tmpDir)
-		if err != nil { return err }
-		action.target = newTarget
-	}
-
 	spec := &mtree.DirectoryHierarchy{}
 	stateDh := &mtree.DirectoryHierarchy{}
 	var err error
 	var excludes []mtree.ExcludeFunc
-	// excludeEmptyFiles is an ExcludeFunc for excluding all files with 0 size
-	var excludeEmptyFiles = func(path string, info os.FileInfo) bool {
-		if info.Size() == 0{
-			return true
-		}
-		return false
-	}
-	excludes = append(excludes, excludeEmptyFiles)
 	var res []mtree.InodeDelta
 
 	fh, err := os.Open(action.validationFile)
@@ -70,11 +54,30 @@ func (action checkAction) Run() error {
 		return err
 	}
 
-	specKeywords := spec.UsedKeywords()
 	stateKeyworks := spec.UsedKeywords()
 
-	stateDh, err = mtree.Walk(action.target, excludes, stateKeyworks, nil)
-	res, err = mtree.Compare(spec, stateDh, specKeywords)
+	// If its not a dir, try to uncompress
+	info, _ := os.Stat(action.target)
+	if !info.IsDir() {
+		uncompressedTar, err := unCompress(action.target)
+		ts := mtree.NewTarStreamer(uncompressedTar, excludes, stateKeyworks)
+		if _, err := io.Copy(ioutil.Discard, ts); err != nil && err != io.EOF {
+			return err
+		}
+		if err := ts.Close(); err != nil {
+			return err
+		}
+		stateDh, err = ts.Hierarchy()
+		if err != nil {
+			return err
+		}
+
+	} else {
+		stateDh, err = mtree.Walk(action.target, excludes, stateKeyworks, nil)
+		if err != nil { return err }
+	}
+
+	res, err = mtree.Compare(spec, stateDh, stateKeyworks)
 	if err != nil {
 		return err
 	}
