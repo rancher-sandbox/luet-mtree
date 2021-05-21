@@ -17,7 +17,6 @@ limitations under the License.
 package action
 
 import (
-	"fmt"
 	"github.com/gabriel-vasile/mimetype"
 	"github.com/klauspost/compress/gzip"
 	"github.com/klauspost/compress/zstd"
@@ -38,13 +37,10 @@ func unCompress(target string) (io.Reader, error) {
 
 	if compressType(target) == GZIP {
 		r, _ = gzip.NewReader(original)
-		fmt.Printf("Found gzip compression\n")
 	} else if compressType(target) == ZSTD{
 		r, _ = zstd.NewReader(original)
-		fmt.Printf("Found zstd compression\n")
 	} else {
 		r = original
-		fmt.Printf("Found no compression\n")
 	}
 
 	return r, nil
