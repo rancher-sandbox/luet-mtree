@@ -19,6 +19,7 @@ package cmd
 import (
 	"github.com/itxaka/luet-mtree/pkg/action"
 	"github.com/spf13/cobra"
+	"os"
 )
 
 // checkCmd represents the check command
@@ -28,6 +29,7 @@ func newCheckCmd() *cobra.Command {
 		Use:          "check [file or dir] [validation file]",
 		Short:        "Check a file or dir against a validation file",
 		SilenceUsage: true,
+		SilenceErrors: true,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if len(args) != 2 {
 				_ = cmd.Usage()
@@ -45,7 +47,7 @@ func newCheckCmd() *cobra.Command {
 			checkAction := action.NewCheckAction(args[0], args[1], format)
 			err := checkAction.Run()
 			if err != nil {
-				return err
+				os.Exit(1)
 			}
 			return nil
 		},

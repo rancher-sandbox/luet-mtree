@@ -19,6 +19,7 @@ package cmd
 import (
 	"github.com/itxaka/luet-mtree/pkg/action"
 	"github.com/spf13/cobra"
+	"os"
 )
 
 // generateCmd represents the generate command
@@ -37,7 +38,7 @@ func newGenerateCmd() *cobra.Command {
 			generateAction := action.NewGenerateAction(args[0], outputFile, keywords)
 			err := generateAction.Run()
 			if err != nil {
-				return err
+				os.Exit(1)
 			}
 			return nil
 		},
