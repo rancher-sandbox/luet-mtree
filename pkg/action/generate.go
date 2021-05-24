@@ -17,6 +17,7 @@ limitations under the License.
 package action
 
 import (
+	"fmt"
 	"github.com/vbatts/go-mtree"
 	"io"
 	"io/ioutil"
@@ -50,6 +51,11 @@ func (action generateAction) Run() error {
 	//}
 	//excludes = append(excludes, excludeEmptyFiles)
 
+	var infoFiles = func(path string, info os.FileInfo) bool {
+		fmt.Printf("%s -> %s with size %s\n", path, info.Name(), info.Size())
+		return false
+	}
+	excludes = append(excludes, infoFiles)
 	fh := os.Stdout
 	if action.outputFile != "" {
 		fh, err = os.OpenFile(action.outputFile, os.O_WRONLY|os.O_TRUNC|os.O_CREATE, 0666)
