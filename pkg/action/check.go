@@ -41,9 +41,9 @@ func NewCheckAction(t string, v string, f string, x []string) *checkAction {
 }
 
 func (action checkAction) Run() error {
-	log.Log(fmt.Sprintf("Checking %s against validation file %s", action.target, action.validationFile))
+	log.Log("Checking %s against validation file %s", action.target, action.validationFile)
 	if len(action.exclude) > 0 {
-		log.Log(fmt.Sprintf("Using the following exclude list: %v", action.exclude))
+		log.Log("Using the following exclude list: %v", action.exclude)
 	}
 	spec := &mtree.DirectoryHierarchy{}
 	stateDh := &mtree.DirectoryHierarchy{}
@@ -103,7 +103,7 @@ func (action checkAction) Run() error {
 			// Got excludes, lets check them!
 			if findInSlice(action.exclude, diff.Path()) {
 				// Oh my! we matched! Log and skip the diff for that path
-				log.Log(fmt.Sprintf("Path %s found against exclude values %s, skipping entry.", diff.Path(), action.exclude))
+				log.Log("Path %s found against exclude values %s, skipping entry.", diff.Path(), action.exclude)
 			} else {
 				// We didnt match the excludes, add it to the results
 				cleanRes = append(cleanRes, diff)

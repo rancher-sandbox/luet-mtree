@@ -17,7 +17,6 @@ limitations under the License.
 package cmd
 
 import (
-	"fmt"
 	"github.com/itxaka/luet-mtree/pkg/action"
 	"github.com/itxaka/luet-mtree/pkg/log"
 	"github.com/spf13/cobra"
@@ -53,7 +52,7 @@ func newCheckCmd() *cobra.Command {
 				log.Log(err.Error())
 				os.Exit(1)
 			}
-			log.Log(fmt.Sprintf("Check for %s with validation file %s done!", args[0], args[1]))
+			log.Log("Check for %s with validation file %s done!", args[0], args[1])
 			return nil
 		},
 	}

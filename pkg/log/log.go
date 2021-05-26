@@ -17,6 +17,6 @@ func init(){
 	log.SetOutput(file)
 }
 
-func Log(text string){
-	log.Println(fmt.Sprintf("[%s] %s", time.Now().Format("2006-01-02 15:04:05"), text))
+func Log(format string, a ...interface{}){
+	log.Println(fmt.Sprintf("[%s] %s", time.Now().Format("2006-01-02 15:04:05"), fmt.Sprintf(format, a...)))
 }

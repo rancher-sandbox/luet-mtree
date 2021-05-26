@@ -17,7 +17,6 @@ limitations under the License.
 package cmd
 
 import (
-	"fmt"
 	"github.com/itxaka/luet-mtree/pkg/action"
 	"github.com/itxaka/luet-mtree/pkg/log"
 	"github.com/spf13/cobra"
@@ -43,7 +42,7 @@ func newGenerateCmd() *cobra.Command {
 				log.Log(err.Error())
 				os.Exit(1)
 			}
-			log.Log(fmt.Sprintf("Generation for %s done!", args[0]))
+			log.Log("Generation for %s done!", args[0])
 			return nil
 		},
 	}
