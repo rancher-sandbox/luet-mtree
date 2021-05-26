@@ -26,25 +26,31 @@ import (
 	"io"
 	"io/ioutil"
 	"os"
+	"strings"
 )
 
 type checkAction struct {
 	target         string
 	validationFile string
 	format         string
+	exclude 	   []string
 }
 
-func NewCheckAction(t string, v string, f string) *checkAction {
-	return &checkAction{target: t, validationFile: v, format: f}
+func NewCheckAction(t string, v string, f string, x []string) *checkAction {
+	return &checkAction{target: t, validationFile: v, format: f, exclude: x}
 }
 
 func (action checkAction) Run() error {
 	log.Log(fmt.Sprintf("Checking %s against validation file %s", action.target, action.validationFile))
+	if len(action.exclude) > 0 {
+		log.Log(fmt.Sprintf("Using the following exclude list: %v", action.exclude))
+	}
 	spec := &mtree.DirectoryHierarchy{}
 	stateDh := &mtree.DirectoryHierarchy{}
 	var err error
 	var excludes []mtree.ExcludeFunc
 	var res []mtree.InodeDelta
+	var cleanRes []mtree.InodeDelta
 
 	fh, err := os.Open(action.validationFile)
 	if err != nil {
@@ -57,6 +63,8 @@ func (action checkAction) Run() error {
 	}
 
 	stateKeyworks := spec.UsedKeywords()
+
+
 
 	// If its not a dir, try to uncompress
 	info, _ := os.Stat(action.target)
@@ -84,17 +92,46 @@ func (action checkAction) Run() error {
 		return err
 	}
 
-	out := formats[action.format](res)
+	// Skip excluded paths from results
+	// This is very useful for cache directories (i.e. luet cache!) or post-install dirs which were not part of the
+	// build process (i.e. OEM configs, cloud-init stuff)
+	for _, diff := range res {
+		// No excludes, return the full list
+		if len(action.exclude) == 0 {
+			cleanRes = res
+		} else {
+			// Got excludes, lets check them!
+			if findInSlice(action.exclude, diff.Path()) {
+				// Oh my! we matched! Log and skip the diff for that path
+				log.Log(fmt.Sprintf("Path %s found against exclude values %s, skipping entry.", diff.Path(), action.exclude))
+			} else {
+				// We didnt match the excludes, add it to the results
+				cleanRes = append(cleanRes, diff)
+			}
+		}
+	}
+
+	out := formats[action.format](cleanRes)
 	if _, err := os.Stdout.Write([]byte(out)); err != nil {
 		return err
 	}
 
-	for _, diff := range res {
+	for _, diff := range cleanRes {
 		if diff.Type() == mtree.Modified {
 			return errors.New("validation failed")
 		}
 	}
 	return nil
+}
+
+
+func findInSlice(slice []string, val string) bool {
+	for _, item := range slice {
+		if strings.HasPrefix(val, item) {
+			return true
+		}
+	}
+	return false
 }
 
 var formats = map[string]func([]mtree.InodeDelta) string{

@@ -17,6 +17,7 @@ limitations under the License.
 package cmd
 
 import (
+	"fmt"
 	"github.com/itxaka/luet-mtree/pkg/action"
 	"github.com/itxaka/luet-mtree/pkg/log"
 	"github.com/spf13/cobra"
@@ -26,6 +27,7 @@ import (
 // checkCmd represents the check command
 func newCheckCmd() *cobra.Command {
 	var format string
+	var exclude []string
 	cmd := &cobra.Command{
 		Use:          "check [file or dir] [validation file]",
 		Short:        "Check a file or dir against a validation file",
@@ -45,18 +47,20 @@ func newCheckCmd() *cobra.Command {
 				return nil
 			}
 
-			checkAction := action.NewCheckAction(args[0], args[1], format)
+			checkAction := action.NewCheckAction(args[0], args[1], format, exclude)
 			err := checkAction.Run()
 			if err != nil {
 				log.Log(err.Error())
 				os.Exit(1)
 			}
+			log.Log(fmt.Sprintf("Check for %s with validation file %s done!", args[0], args[1]))
 			return nil
 		},
 	}
 
 	f := cmd.Flags()
 	f.StringVarP(&format, "format", "f", "bsd", "Format for output. Choices are bsd, path and json.")
+	f.StringSliceVarP(&exclude, "exclude", "x", make([]string, 0), "Exclude paths from check. Checks against the path prefix, so 'oem/' will cover both 'oem/' and 'oem/features/' paths.")
 
 	return cmd
 }
