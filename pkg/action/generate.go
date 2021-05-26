@@ -17,8 +17,6 @@ limitations under the License.
 package action
 
 import (
-	"fmt"
-	"github.com/itxaka/luet-mtree/pkg/log"
 	"github.com/vbatts/go-mtree"
 	"io"
 	"io/ioutil"
@@ -43,11 +41,6 @@ func (action generateAction) Run() error {
 
 	var err error
 
-	var infoFiles = func(path string, info os.FileInfo) bool {
-		log.Log(fmt.Sprintf("%s with size %v\n", path, info.Size()))
-		return false
-	}
-	excludes = append(excludes, infoFiles)
 	fh := os.Stdout
 	if action.outputFile != "" {
 		fh, err = os.OpenFile(action.outputFile, os.O_WRONLY|os.O_TRUNC|os.O_CREATE, 0666)
