@@ -18,6 +18,7 @@ package cmd
 
 import (
 	"github.com/itxaka/luet-mtree/pkg/action"
+	"github.com/itxaka/luet-mtree/pkg/log"
 	"github.com/spf13/cobra"
 	"os"
 )
@@ -38,6 +39,7 @@ func newGenerateCmd() *cobra.Command {
 			generateAction := action.NewGenerateAction(args[0], outputFile, keywords)
 			err := generateAction.Run()
 			if err != nil {
+				log.Log(err.Error())
 				os.Exit(1)
 			}
 			return nil

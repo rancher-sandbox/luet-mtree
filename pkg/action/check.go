@@ -21,6 +21,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/itxaka/luet-mtree/pkg/log"
 	"github.com/vbatts/go-mtree"
 	"io"
 	"io/ioutil"
@@ -38,6 +39,7 @@ func NewCheckAction(t string, v string, f string) *checkAction {
 }
 
 func (action checkAction) Run() error {
+	log.Log(fmt.Sprintf("Checking %s against validation file %s", action.target, action.validationFile))
 	spec := &mtree.DirectoryHierarchy{}
 	stateDh := &mtree.DirectoryHierarchy{}
 	var err error

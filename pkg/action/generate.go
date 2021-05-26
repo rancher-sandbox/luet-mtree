@@ -18,6 +18,7 @@ package action
 
 import (
 	"fmt"
+	"github.com/itxaka/luet-mtree/pkg/log"
 	"github.com/vbatts/go-mtree"
 	"io"
 	"io/ioutil"
@@ -42,17 +43,8 @@ func (action generateAction) Run() error {
 
 	var err error
 
-	// excludeEmptyFiles is an ExcludeFunc for excluding all files with 0 size
-	//var excludeEmptyFiles = func(path string, info os.FileInfo) bool {
-	//	if info.Size() == 0{
-	//return true
-	//}
-	//	return false
-	//}
-	//excludes = append(excludes, excludeEmptyFiles)
-
 	var infoFiles = func(path string, info os.FileInfo) bool {
-		fmt.Printf("%s -> %s with size %s\n", path, info.Name(), info.Size())
+		log.Log(fmt.Sprintf("%s with size %v\n", path, info.Size()))
 		return false
 	}
 	excludes = append(excludes, infoFiles)

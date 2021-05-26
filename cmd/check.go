@@ -18,6 +18,7 @@ package cmd
 
 import (
 	"github.com/itxaka/luet-mtree/pkg/action"
+	"github.com/itxaka/luet-mtree/pkg/log"
 	"github.com/spf13/cobra"
 	"os"
 )
@@ -47,6 +48,7 @@ func newCheckCmd() *cobra.Command {
 			checkAction := action.NewCheckAction(args[0], args[1], format)
 			err := checkAction.Run()
 			if err != nil {
+				log.Log(err.Error())
 				os.Exit(1)
 			}
 			return nil
