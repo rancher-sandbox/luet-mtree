@@ -1,8 +1,10 @@
 package log
 
 import (
+	"fmt"
 	defaultLog "log"
 	"os"
+	"time"
 )
 
 var log defaultLog.Logger
@@ -16,5 +18,5 @@ func init(){
 }
 
 func Log(text string){
-	log.Println(text)
+	log.Println(fmt.Sprintf("[%s] %s", time.Now().Format("2006-01-02 15:04:05"), text))
 }
