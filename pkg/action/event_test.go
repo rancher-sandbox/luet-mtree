@@ -61,7 +61,7 @@ func TestBlacklistUnpack(t *testing.T) {
 }
 
 func TestUnpackFailureToValidate(t *testing.T) {
-	image := "quay.io/costoolkit/releases-opensuse:systemd-boot-live-26"
+	image := "quay.io/costoolkit/releases-opensuse:syslinux-live-6.03"
 	dest, _ := os.MkdirTemp("", "luet-mtree-test-unpack")
 	defer os.RemoveAll(dest)
 	data := fmt.Sprintf("{\"data\": {\"Image\": \"%s\", \"Dest\": \"%s/\"}}", image, dest)
