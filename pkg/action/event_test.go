@@ -9,7 +9,6 @@ import (
 	"testing"
 )
 
-
 func TestMissingParamsUnpack(t *testing.T) {
 	data := `{"data": {"Image": "testimage"}}`
 	eventDispatcher := NewEventDispatcherAction("image.post.unpack", data)
@@ -109,7 +108,7 @@ func TestUnpackSuccess(t *testing.T) {
 	assert.Empty(t, out["data"])
 }
 
-func commonKeysAssertUnpack(t *testing.T, out map[string]string){
+func commonKeysAssertUnpack(t *testing.T, out map[string]string) {
 	assert.NotEmpty(t, out)
 	assert.Contains(t, out, "data")
 	assert.Contains(t, out, "error")

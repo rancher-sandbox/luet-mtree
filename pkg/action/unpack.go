@@ -14,8 +14,6 @@ import (
 	"strings"
 )
 
-
-
 type YamlMtree struct {
 	Mtree string
 }
@@ -23,9 +21,7 @@ type YamlMtree struct {
 // excludes is a list of dirs that are excluded from the mtree check, usually those that are modified
 var excludes = []string{"var/cache/luet", "usr/local/tmp", "oem/", "usr/local/cloud-config", "usr/local/lost+found", "lost+found", "tmp/", "mnt/"}
 
-
-
-func UnpackAndMtree(image string, destination string) (map[string]string, error){
+func UnpackAndMtree(image string, destination string) (map[string]string, error) {
 	// Create temp dir for extracting the metadata
 	tmpDirMetadata := fmt.Sprintf("%s/luet-mtree-metadata-%d", os.TempDir(), rand.Int())
 
@@ -119,7 +115,7 @@ func UnpackAndMtree(image string, destination string) (map[string]string, error)
 			_, _ = mtreeFailedOutput.Write([]byte(out))
 			_ = mtreeFailedOutput.Close()
 			returnData := map[string]string{
-				"data": "",
+				"data":  "",
 				"error": "Validation failed, check /tmp/luet_mtree_failures.log for the full failures",
 				"state": "Checks failed",
 			}
