@@ -9,7 +9,7 @@ import (
 
 var log defaultLog.Logger
 
-func init(){
+func init() {
 	file, err := os.OpenFile("/tmp/luet-mtree.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0666)
 	if err != nil {
 		log.Fatal(err)
@@ -17,6 +17,6 @@ func init(){
 	log.SetOutput(file)
 }
 
-func Log(format string, a ...interface{}){
+func Log(format string, a ...interface{}) {
 	log.Println(fmt.Sprintf("[%s] %s", time.Now().Format("2006-01-02 15:04:05"), fmt.Sprintf(format, a...)))
 }
