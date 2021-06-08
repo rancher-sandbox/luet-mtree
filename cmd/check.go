@@ -28,9 +28,9 @@ func newCheckCmd() *cobra.Command {
 	var format string
 	var exclude []string
 	cmd := &cobra.Command{
-		Use:          "check [file or dir] [validation file]",
-		Short:        "Check a file or dir against a validation file",
-		SilenceUsage: true,
+		Use:           "check [file or dir] [validation file]",
+		Short:         "Check a file or dir against a validation file",
+		SilenceUsage:  true,
 		SilenceErrors: true,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if len(args) != 2 {

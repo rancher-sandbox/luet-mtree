@@ -31,7 +31,6 @@ const (
 	NONE = "none"
 )
 
-
 func unCompress(target string) (io.Reader, error) {
 	original, _ := os.Open(target)
 	var r io.Reader
@@ -39,7 +38,7 @@ func unCompress(target string) (io.Reader, error) {
 	if compressType(target) == GZIP {
 		log.Log("Found GZIP compression for file %s", target)
 		r, _ = gzip.NewReader(original)
-	} else if compressType(target) == ZSTD{
+	} else if compressType(target) == ZSTD {
 		log.Log("Found ZSTD compression for file %s", target)
 		r, _ = zstd.NewReader(original)
 	} else {
@@ -49,7 +48,6 @@ func unCompress(target string) (io.Reader, error) {
 
 	return r, nil
 }
-
 
 func compressType(file string) string {
 	mime, _ := mimetype.DetectFile(file)

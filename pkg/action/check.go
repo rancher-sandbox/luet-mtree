@@ -33,7 +33,7 @@ type checkAction struct {
 	target         string
 	validationFile string
 	format         string
-	exclude 	   []string
+	exclude        []string
 }
 
 func NewCheckAction(t string, v string, f string, x []string) *checkAction {
@@ -64,8 +64,6 @@ func (action checkAction) Run() error {
 
 	stateKeyworks := spec.UsedKeywords()
 
-
-
 	// If its not a dir, try to uncompress
 	info, _ := os.Stat(action.target)
 	if !info.IsDir() {
@@ -84,7 +82,9 @@ func (action checkAction) Run() error {
 
 	} else {
 		stateDh, err = mtree.Walk(action.target, excludes, stateKeyworks, nil)
-		if err != nil { return err }
+		if err != nil {
+			return err
+		}
 	}
 
 	res, err = mtree.Compare(spec, stateDh, stateKeyworks)
@@ -123,7 +123,6 @@ func (action checkAction) Run() error {
 	}
 	return nil
 }
-
 
 func findInSlice(slice []string, val string) bool {
 	for _, item := range slice {
