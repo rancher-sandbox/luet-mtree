@@ -10,13 +10,18 @@ build:
 	go build -ldflags '$(LDFLAGS)' -o bin/
 
 vet:
-	go vet ./...
+	go vet ${PKG}
 
 fmt:
-	go fmt ./...
+	go fmt ${PKG}
 
 test:
-	go test ./... -race
+ifneq ($(shell id -u), 0)
+	@echo "Tests need to run under root user to download and unpack docker images."
+	@exit 1
+else
+	go test ${PKG} -race -coverprofile=coverage.txt -covermode=atomic
+endif
 
 lint: fmt vet
 
