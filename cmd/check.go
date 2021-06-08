@@ -47,8 +47,13 @@ func newCheckCmd() *cobra.Command {
 			}
 
 			checkAction := action.NewCheckAction(args[0], args[1], format, exclude)
-			err := checkAction.Run()
+			out, err := checkAction.Run()
+
 			if err != nil {
+				if out != "" {
+					// The called decides to write it to standard out or not instead of the package
+					_, _ = os.Stdout.Write([]byte(out))
+				}
 				log.Log(err.Error())
 				os.Exit(1)
 			}

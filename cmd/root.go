@@ -23,9 +23,14 @@ import (
 // NewRootCmd represents the base command when called without any subcommands
 func NewRootCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:           "luet-mtree",
-		Short:         "A brief description of your application",
+		Use:           "luet-mtree [event] [payload]",
+		Args:          cobra.ExactArgs(2),
+		Short:         "Without a subcommand, luet mtree will parse events and their payloads from luet",
 		SilenceErrors: true,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			err := newEventCmd(args)
+			return err
+		},
 	}
 
 	cmd.AddCommand(newGenerateCmd())

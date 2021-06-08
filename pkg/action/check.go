@@ -40,7 +40,7 @@ func NewCheckAction(t string, v string, f string, x []string) *checkAction {
 	return &checkAction{target: t, validationFile: v, format: f, exclude: x}
 }
 
-func (action checkAction) Run() error {
+func (action checkAction) Run() (string, error) {
 	log.Log("Checking %s against validation file %s", action.target, action.validationFile)
 	if len(action.exclude) > 0 {
 		log.Log("Using the following exclude list: %v", action.exclude)
@@ -54,12 +54,12 @@ func (action checkAction) Run() error {
 
 	fh, err := os.Open(action.validationFile)
 	if err != nil {
-		return err
+		return "", err
 	}
 	spec, err = mtree.ParseSpec(fh)
 	err = fh.Close()
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	stateKeyworks := spec.UsedKeywords()
@@ -70,26 +70,26 @@ func (action checkAction) Run() error {
 		uncompressedTar, err := unCompress(action.target)
 		ts := mtree.NewTarStreamer(uncompressedTar, excludes, stateKeyworks)
 		if _, err := io.Copy(ioutil.Discard, ts); err != nil && err != io.EOF {
-			return err
+			return "", err
 		}
 		if err := ts.Close(); err != nil {
-			return err
+			return "", err
 		}
 		stateDh, err = ts.Hierarchy()
 		if err != nil {
-			return err
+			return "", err
 		}
 
 	} else {
 		stateDh, err = mtree.Walk(action.target, excludes, stateKeyworks, nil)
 		if err != nil {
-			return err
+			return "", err
 		}
 	}
 
 	res, err = mtree.Compare(spec, stateDh, stateKeyworks)
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	// Skip excluded paths from results
@@ -112,16 +112,13 @@ func (action checkAction) Run() error {
 	}
 
 	out := formats[action.format](cleanRes)
-	if _, err := os.Stdout.Write([]byte(out)); err != nil {
-		return err
-	}
 
 	for _, diff := range cleanRes {
-		if diff.Type() == mtree.Modified {
-			return errors.New("validation failed")
+		if diff.Type() == mtree.Modified || diff.Type() == mtree.Missing {
+			return out, errors.New("validation failed")
 		}
 	}
-	return nil
+	return out, nil
 }
 
 func findInSlice(slice []string, val string) bool {
