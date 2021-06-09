@@ -11,7 +11,9 @@ import (
 )
 
 type UnpackEvent struct {
-	Data EventData
+	Name string `json:"name"`
+	Data string `json:"data"`
+	File string `json:"file"`
 }
 
 type EventData struct {
@@ -38,27 +40,37 @@ func (event LuetEvent) Run() (map[string]string, error) {
 	switch event.event {
 	case bus.EventImagePostUnPack:
 		// Unpack payload
-		dataTmp := UnpackEvent{}
-		err := json.Unmarshal([]byte(event.payload), &dataTmp)
+		payloadTmp := UnpackEvent{}
+		err := json.Unmarshal([]byte(event.payload), &payloadTmp)
 		if err != nil {
 			log.Log("Error while unmarshalling payload")
+			log.Log("Payload: %s", event.payload)
+			return helpers.WrapErrorMap(err)
+		}
+		// data is a json inside a string
+		dataTmp := EventData{}
+
+		err = json.Unmarshal([]byte(payloadTmp.Data), &dataTmp)
+		if err != nil {
+			log.Log("Error while unmarshalling data from the payload")
+			log.Log("Payload: %s", payloadTmp.Data)
 			return helpers.WrapErrorMap(err)
 		}
 
 		// Check correct payload data
-		if dataTmp.Data.Image == "" || dataTmp.Data.Dest == "" {
+		if dataTmp.Image == "" || dataTmp.Dest == "" {
 			log.Log("Some fields are missing from the event, cannot continue")
 			return helpers.WrapErrorMap(errors.New("fields missing from payload"))
 		}
 
 		// Check blacklist to skip images
 		for _, s := range ImageBlacklist {
-			if strings.Contains(dataTmp.Data.Image, s) {
+			if strings.Contains(dataTmp.Image, s) {
 				log.Log("Image type found in blacklist, skipping")
 				return helpers.WrapErrorMap(nil)
 			}
 		}
-		return UnpackAndMtree(dataTmp.Data.Image, dataTmp.Data.Dest)
+		return UnpackAndMtree(dataTmp.Image, dataTmp.Dest)
 	default:
 		log.Log("No event that I can recognize")
 		return helpers.WrapErrorMap(nil)

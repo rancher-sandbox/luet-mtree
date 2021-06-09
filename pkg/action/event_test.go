@@ -1,7 +1,7 @@
 package action
 
 import (
-	"fmt"
+	"encoding/json"
 	"github.com/docker/docker/api/types"
 	"github.com/mudler/luet/pkg/helpers/docker"
 	"github.com/stretchr/testify/assert"
@@ -9,8 +9,31 @@ import (
 	"testing"
 )
 
+// createPayload creates a valid payload structure and marshals it to a string for use in testing
+func createPayload(image string, dest string, t *testing.T) string {
+	event := EventData{
+		Image: image,
+		Dest:  dest,
+	}
+	eventBytes, err := json.Marshal(event)
+	if err != nil {
+		t.Fatal("Error while marshalling event")
+	}
+	unpackEvent := UnpackEvent{
+		Data: string(eventBytes),
+	}
+
+	unpackBytes, err := json.Marshal(unpackEvent)
+
+	if err != nil {
+		t.Fatal("Error while marshalling event payload")
+	}
+
+	return string(unpackBytes)
+}
+
 func TestMissingParamsUnpack(t *testing.T) {
-	data := `{"data": {"Image": "testimage"}}`
+	data := `{"data": "{\"Image\": \"testimage\"}"}`
 	eventDispatcher := NewEventDispatcherAction("image.post.unpack", data)
 	out, err := eventDispatcher.Run()
 	commonKeysAssertUnpack(t, out)
@@ -32,22 +55,13 @@ func TestMalformedPayloadUnpack(t *testing.T) {
 }
 
 func TestBlacklistUnpack(t *testing.T) {
-	for _, image := range ImageBlacklist {
-		data := fmt.Sprintf("{\"data\": {\"Image\": \"%s\", \"Dest\": \"/tmp/upgrade\"}}", image)
-		eventDispatcher := NewEventDispatcherAction("image.post.unpack", data)
-		out, err := eventDispatcher.Run()
-		commonKeysAssertUnpack(t, out)
-		assert.Equal(t, out["state"], "All checks succeeded")
-		assert.NoError(t, err)
-		assert.Empty(t, err)
-	}
-
+	dest := "/tmp/upgrade"
 	moreData := []string{
-		`{"data": {"Image": "raccos/releases-opensuse/repository.yaml.gz", "Dest": "/tmp/upgrade"}}`,
-		`{"data": {"Image": "raccos/releases-opensuse/tree.tar.yaml.gz", "Dest": "/tmp/upgrade"}}`,
-		`{"data": {"Image": "raccos/releases-opensuse/repository.meta.yaml.tar.zstd", "Dest": "/tmp/upgrade"}}`,
-		`{"data": {"Image": "raccos/releases-opensuse/compilertree.tar", "Dest": "/tmp/upgrade"}}`,
-		`{"data": {"Image": "raccos/releases-opensuse/compilertree.tar.gz", "Dest": "/tmp/upgrade"}}`,
+		createPayload("raccos/releases-opensuse/repository.yaml.gz", dest, t),
+		createPayload("raccos/releases-opensuse/tree.tar.yaml.gz", dest, t),
+		createPayload("raccos/releases-opensuse/repository.meta.yaml.tar.zstd", dest, t),
+		createPayload("raccos/releases-opensuse/compilertree.tar", dest, t),
+		createPayload("raccos/releases-opensuse/compilertree.tar.gz", dest, t),
 	}
 
 	for _, data := range moreData {
@@ -61,11 +75,11 @@ func TestBlacklistUnpack(t *testing.T) {
 }
 
 func TestUnpackFailureToValidate(t *testing.T) {
-	image := "quay.io/costoolkit/releases-opensuse:syslinux-live-6.03"
 	dest, _ := os.MkdirTemp("", "luet-mtree-test-unpack")
 	defer os.RemoveAll(dest)
-	data := fmt.Sprintf("{\"data\": {\"Image\": \"%s\", \"Dest\": \"%s/\"}}", image, dest)
-	eventDispatcher := NewEventDispatcherAction("image.post.unpack", data)
+	payload := createPayload("quay.io/costoolkit/releases-opensuse:syslinux-live-6.03", dest, t)
+
+	eventDispatcher := NewEventDispatcherAction("image.post.unpack", payload)
 	out, err := eventDispatcher.Run()
 	commonKeysAssertUnpack(t, out)
 
@@ -99,8 +113,8 @@ func TestUnpackSuccess(t *testing.T) {
 	}
 
 	// Now that we have download and extracted the image, call the unpack event on it like luet does
-	data := fmt.Sprintf("{\"data\": {\"Image\": \"%s\", \"Dest\": \"%s/\"}}", image, imageTmp)
-	eventDispatcher := NewEventDispatcherAction("image.post.unpack", data)
+	payload := createPayload(image, imageTmp, t)
+	eventDispatcher := NewEventDispatcherAction("image.post.unpack", payload)
 	out, err := eventDispatcher.Run()
 	commonKeysAssertUnpack(t, out)
 	assert.Equal(t, out["state"], "All checks succeeded")
