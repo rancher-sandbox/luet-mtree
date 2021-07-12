@@ -27,10 +27,11 @@ type generateAction struct {
 	target     string
 	outputFile string
 	keywords   []string
+	overrideKeywords   []string
 }
 
-func NewGenerateAction(t string, o string, k []string) *generateAction {
-	return &generateAction{target: t, outputFile: o, keywords: k}
+func NewGenerateAction(t string, o string, k []string, K []string) *generateAction {
+	return &generateAction{target: t, outputFile: o, keywords: k, overrideKeywords: K}
 }
 
 func (action generateAction) Run() error {
@@ -53,12 +54,21 @@ func (action generateAction) Run() error {
 	// TODO(itxaka) we may be able to use tar_time ?
 	currentKeywords := []mtree.Keyword{
 		"type",
-		"xattrs",
 		"sha512digest",
 	}
 
 	if len(action.keywords) > 0 {
 		for _, k := range action.keywords {
+			if !mtree.InKeywordSlice(mtree.Keyword(k), currentKeywords) {
+				currentKeywords = append(currentKeywords, mtree.Keyword(k))
+			}
+		}
+	}
+
+	if len(action.overrideKeywords) > 0 {
+		// Empty current keywords as we want to override them
+		currentKeywords = []mtree.Keyword{}
+		for _, k := range action.overrideKeywords {
 			if !mtree.InKeywordSlice(mtree.Keyword(k), currentKeywords) {
 				currentKeywords = append(currentKeywords, mtree.Keyword(k))
 			}
