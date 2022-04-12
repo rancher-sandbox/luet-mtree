@@ -24,10 +24,10 @@ import (
 )
 
 type generateAction struct {
-	target     string
-	outputFile string
-	keywords   []string
-	overrideKeywords   []string
+	target           string
+	outputFile       string
+	keywords         []string
+	overrideKeywords []string
 }
 
 func NewGenerateAction(t string, o string, k []string, K []string) *generateAction {

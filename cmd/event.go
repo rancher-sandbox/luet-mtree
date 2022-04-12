@@ -2,7 +2,7 @@ package cmd
 
 import (
 	"encoding/json"
-	"github.com/itxaka/luet-mtree/pkg/action"
+	"github.com/rancher-sandbox/luet-mtree/pkg/action"
 	"os"
 )
 

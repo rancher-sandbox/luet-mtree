@@ -2,8 +2,8 @@
 builds:
   - ldflags:
       - -w -s
-      - -X github.com/itxaka/luet-mtree/internal/version.version={{.Tag}}
-      - -X github.com/itxaka/luet-mtree/internal/version.gitCommit={{.Commit}}
+      - -X github.com/rancher-sandbox/luet-mtree/internal/version.version={{.Tag}}
+      - -X github.com/rancher-sandbox/luet-mtree/internal/version.gitCommit={{.Commit}}
     env:
       - CGO_ENABLED=0
     goos:

@@ -18,7 +18,7 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/itxaka/luet-mtree/internal/version"
+	"github.com/rancher-sandbox/luet-mtree/internal/version"
 	"github.com/spf13/cobra"
 )
 

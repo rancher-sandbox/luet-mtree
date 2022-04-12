@@ -3,6 +3,7 @@ package action
 import (
 	"encoding/json"
 	"github.com/docker/docker/api/types"
+	"github.com/mudler/luet/pkg/api/core/context"
 	"github.com/mudler/luet/pkg/helpers/docker"
 	"github.com/stretchr/testify/assert"
 	"os"
@@ -92,9 +93,6 @@ func TestUnpackFailureToValidate(t *testing.T) {
 func TestUnpackSuccess(t *testing.T) {
 	// Image to download and check the mtree values
 	image := "quay.io/costoolkit/releases-opensuse:systemd-boot-live-26"
-	// Dir to temporally extract the full image
-	extractTempDir, _ := os.MkdirTemp("", "luet-mtree-docker-extract")
-	defer os.RemoveAll(extractTempDir)
 	// Destination dir for the image contents
 	imageTmp, _ := os.MkdirTemp("", "luet-mtree-image-extract")
 	defer os.RemoveAll(imageTmp)
@@ -107,7 +105,8 @@ func TestUnpackSuccess(t *testing.T) {
 		IdentityToken: "",
 		RegistryToken: "",
 	}
-	_, err := docker.DownloadAndExtractDockerImage(extractTempDir, image, imageTmp, auth, false)
+	ctx := context.NewContext()
+	_, err := docker.DownloadAndExtractDockerImage(ctx, image, imageTmp, auth, false)
 	if err != nil {
 		t.Fatal(err)
 	}

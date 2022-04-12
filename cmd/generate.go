@@ -18,8 +18,8 @@ package cmd
 
 import (
 	"errors"
-	"github.com/itxaka/luet-mtree/pkg/action"
-	"github.com/itxaka/luet-mtree/pkg/log"
+	"github.com/rancher-sandbox/luet-mtree/pkg/action"
+	"github.com/rancher-sandbox/luet-mtree/pkg/log"
 	"github.com/spf13/cobra"
 	"os"
 )
