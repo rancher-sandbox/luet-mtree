@@ -3,9 +3,10 @@ package action
 import (
 	"fmt"
 	"github.com/docker/docker/api/types"
-	"github.com/itxaka/luet-mtree/pkg/helpers"
-	"github.com/itxaka/luet-mtree/pkg/log"
+	"github.com/mudler/luet/pkg/api/core/context"
 	"github.com/mudler/luet/pkg/helpers/docker"
+	"github.com/rancher-sandbox/luet-mtree/pkg/helpers"
+	"github.com/rancher-sandbox/luet-mtree/pkg/log"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"math/rand"
@@ -54,9 +55,8 @@ func UnpackAndMtree(image string, destination string) (map[string]string, error)
 		RegistryToken: "",
 	}
 
-	// Dir for temporarily extracting the docker image
-	extractTempDir, _ := os.MkdirTemp("", "luet-mtree-docker-extract")
-	info, err := docker.DownloadAndExtractDockerImage(extractTempDir, metadataImage, tmpDirMetadata, auth, false)
+	ctx := context.NewContext()
+	info, err := docker.DownloadAndExtractDockerImage(ctx, metadataImage, tmpDirMetadata, auth, false)
 	if err != nil {
 		log.Log("Error while downloading docker image: %s", err.Error())
 		return helpers.WrapErrorMap(err)

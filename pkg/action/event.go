@@ -3,10 +3,10 @@ package action
 import (
 	"encoding/json"
 	"errors"
-	"github.com/itxaka/luet-mtree/pkg/helpers"
-	"github.com/itxaka/luet-mtree/pkg/log"
 	"github.com/mudler/go-pluggable"
-	"github.com/mudler/luet/pkg/bus"
+	"github.com/mudler/luet/pkg/api/core/bus"
+	"github.com/rancher-sandbox/luet-mtree/pkg/helpers"
+	"github.com/rancher-sandbox/luet-mtree/pkg/log"
 	"strings"
 )
 

@@ -17,7 +17,7 @@ limitations under the License.
 package cmd
 
 import (
-	"github.com/itxaka/luet-mtree/pkg/log"
+	"github.com/rancher-sandbox/luet-mtree/pkg/log"
 	"github.com/spf13/cobra"
 	"os"
 )

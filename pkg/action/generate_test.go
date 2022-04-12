@@ -6,8 +6,6 @@ import (
 	"testing"
 )
 
-
-
 func TestGenerateExpandKeywords(t *testing.T) {
 	output := captureOutputAndParse(t, func() {
 		action := NewGenerateAction("testdata/checkfiles/", "", []string{"size"}, make([]string, 0))
@@ -18,8 +16,8 @@ func TestGenerateExpandKeywords(t *testing.T) {
 	})
 
 	assert.Contains(t, output.getRealKeywords(), mtree.Keyword("size"))
-	assert.Contains(t, output.getRealKeywords(), mtree.Keyword("sha512digest"))  // We add this as default
-	assert.Contains(t, output.getRealKeywords(), mtree.Keyword("type"))  // We add this as default
+	assert.Contains(t, output.getRealKeywords(), mtree.Keyword("sha512digest")) // We add this as default
+	assert.Contains(t, output.getRealKeywords(), mtree.Keyword("type"))         // We add this as default
 	assert.NotContains(t, output.getRealKeywords(), mtree.Keyword("uid"))
 	assert.NotContains(t, output.getRealKeywords(), mtree.Keyword("gid"))
 
@@ -33,8 +31,8 @@ func TestGenerateExpandKeywords(t *testing.T) {
 
 	assert.Contains(t, output.getRealKeywords(), mtree.Keyword("size"))
 	assert.Contains(t, output.getRealKeywords(), mtree.Keyword("mode"))
-	assert.Contains(t, output.getRealKeywords(), mtree.Keyword("sha512digest"))  // We add this as default
-	assert.Contains(t, output.getRealKeywords(), mtree.Keyword("type"))  // We add this as default
+	assert.Contains(t, output.getRealKeywords(), mtree.Keyword("sha512digest")) // We add this as default
+	assert.Contains(t, output.getRealKeywords(), mtree.Keyword("type"))         // We add this as default
 	assert.NotContains(t, output.getRealKeywords(), mtree.Keyword("uid"))
 	assert.NotContains(t, output.getRealKeywords(), mtree.Keyword("gid"))
 }
@@ -69,4 +67,3 @@ func TestGenerateOverrideKeywords(t *testing.T) {
 	assert.NotContains(t, output.getRealKeywords(), mtree.Keyword("uid"))
 	assert.NotContains(t, output.getRealKeywords(), mtree.Keyword("gid"))
 }
-

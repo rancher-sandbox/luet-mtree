@@ -10,7 +10,7 @@ import (
 // captureOutputAndParse hijacks stdout and uses that output to try to return an
 // mtree.DirectoryHierarchy
 // This allows us to parse the mtree output from generate so we can easily parse keywords used for example
-func captureOutputAndParse(t *testing.T, f func())  CustomDirectoryHierarchy {
+func captureOutputAndParse(t *testing.T, f func()) CustomDirectoryHierarchy {
 	// Overwrite stdout
 	r, w, err := os.Pipe()
 	if err != nil {
