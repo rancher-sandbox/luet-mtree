@@ -20,7 +20,7 @@ type YamlMtree struct {
 }
 
 // excludes is a list of dirs that are excluded from the mtree check, usually those that are modified
-var excludes = []string{"var/cache/luet", "oem/", "usr/local/", "lost+found", "tmp/", "mnt/"}
+var excludes = []string{"var/cache/luet", "oem", "usr/local/", "lost+found", "tmp/", "mnt/"}
 
 func UnpackAndMtree(image string, destination string) (map[string]string, error) {
 	// Create temp dir for extracting the metadata
