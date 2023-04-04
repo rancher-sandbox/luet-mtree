@@ -3,7 +3,7 @@ module github.com/rancher-sandbox/luet-mtree
 go 1.18
 
 require (
-	github.com/docker/docker v20.10.14+incompatible
+	github.com/docker/docker v20.10.24+incompatible
 	github.com/gabriel-vasile/mimetype v1.4.0
 	github.com/klauspost/compress v1.15.1
 	github.com/mudler/go-pluggable v0.0.0-20211206135551-9263b05c562e
